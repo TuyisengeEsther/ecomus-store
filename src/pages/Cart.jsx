@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { placeOrderFromCart } from "../services/orderService";
 
 function Cart() {
   const {
@@ -10,6 +12,9 @@ function Cart() {
     clearCart,
     total,
   } = useCart();
+
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   const getItemId = (item) => {
     return item.id || item.cartItemId || item._id;
@@ -24,12 +29,23 @@ function Cart() {
   };
 
   const getImage = (item) => {
-    return (
-      item.product?.images?.[0]?.url ||
-      item.images?.[0]?.url ||
-      item.imageUrl ||
-      ""
-    );
+    return item.product?.images?.[0]?.url || item.images?.[0]?.url || item.imageUrl || "";
+  };
+
+  const handleCheckout = async () => {
+    try {
+      setCheckoutLoading(true);
+      setMessage("");
+
+      await placeOrderFromCart();
+      await clearCart();
+
+      setMessage("Order placed successfully!");
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Checkout failed. Please login again.");
+    } finally {
+      setCheckoutLoading(false);
+    }
   };
 
   if (loadingCart) {
@@ -42,6 +58,8 @@ function Cart() {
         <h1 className="text-3xl font-bold mb-3">Your cart is empty</h1>
         <p className="text-gray-600 mb-6">Add products before checkout.</p>
 
+        {message && <p className="mb-4 text-green-600 font-semibold">{message}</p>}
+
         <Link to="/" className="bg-black text-white px-6 py-3 rounded">
           Continue Shopping
         </Link>
@@ -52,6 +70,12 @@ function Cart() {
   return (
     <div>
       <h1 className="text-3xl font-bold mb-6">Shopping Cart</h1>
+
+      {message && (
+        <p className="bg-blue-100 text-blue-700 p-3 rounded mb-4">
+          {message}
+        </p>
+      )}
 
       <div className="space-y-4">
         {cartItems.map((item) => {
@@ -85,7 +109,9 @@ function Cart() {
                   {product.category?.name || "Product"}
                 </p>
 
-                <p className="font-semibold mt-2">${Number(price).toFixed(2)}</p>
+                <p className="font-semibold mt-2">
+                  ${Number(price).toFixed(2)}
+                </p>
               </div>
 
               <div className="flex items-center gap-2">
@@ -139,8 +165,12 @@ function Cart() {
             Clear Cart
           </button>
 
-          <button className="bg-black text-white px-5 py-3 rounded">
-            Checkout
+          <button
+            onClick={handleCheckout}
+            disabled={checkoutLoading}
+            className="bg-black text-white px-5 py-3 rounded disabled:bg-gray-500"
+          >
+            {checkoutLoading ? "Checking out..." : "Checkout"}
           </button>
         </div>
       </div>

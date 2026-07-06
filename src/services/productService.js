@@ -10,6 +10,11 @@ export const getProductById = async (id) => {
   return res.data;
 };
 
+export const getProductsByCategory = async (categoryId) => {
+  const res = await API.get(`/api/public/products/category/${categoryId}`);
+  return res.data;
+};
+
 export const getCategories = async () => {
   const res = await API.get("/api/categories?page=1&limit=50");
   return res.data;

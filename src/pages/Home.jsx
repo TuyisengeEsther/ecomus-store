@@ -24,6 +24,7 @@ function Home() {
   const loadHomeData = async () => {
     try {
       setLoading(true);
+      setError("");
 
       const productResponse = await getProducts();
       const categoryResponse = await getCategories();
@@ -43,13 +44,14 @@ function Home() {
 
     try {
       setLoading(true);
+      setError("");
 
       if (!categoryId) {
         const response = await getProducts();
         setProducts(response.data?.all || []);
       } else {
         const response = await getProductsByCategory(categoryId);
-        setProducts(response.data?.all || response.data || []);
+        setProducts(response.data || []);
       }
     } catch (err) {
       setError("Failed to load category products.");
@@ -60,7 +62,7 @@ function Home() {
 
   const displayedProducts = products
     .filter((product) =>
-      product.name.toLowerCase().includes(search.toLowerCase())
+      product.name?.toLowerCase().includes(search.toLowerCase())
     )
     .sort((a, b) => {
       if (sort === "low-high") return Number(a.price) - Number(b.price);

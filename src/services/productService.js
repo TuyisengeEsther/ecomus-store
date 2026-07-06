@@ -11,7 +11,9 @@ export const getProductById = async (id) => {
 };
 
 export const getProductsByCategory = async (categoryId) => {
-  const res = await API.get(`/api/public/products/category/${categoryId}`);
+  const res = await API.get(
+    `/api/public/products/category/${categoryId}?page=1&limit=12`
+  );
   return res.data;
 };
 

@@ -32,6 +32,10 @@ function Navbar() {
             )}
           </NavLink>
 
+          {token && <NavLink to="/orders">Orders</NavLink>}
+
+          {token && <NavLink to="/profile">Profile</NavLink>}
+
           {token ? (
             <button
               onClick={handleLogout}
@@ -42,6 +46,7 @@ function Navbar() {
           ) : (
             <>
               <NavLink to="/login">Login</NavLink>
+
               <NavLink
                 to="/register"
                 className="bg-black text-white px-4 py-2 rounded"
